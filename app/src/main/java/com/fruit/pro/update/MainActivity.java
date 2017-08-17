@@ -14,33 +14,33 @@ import com.fruit.updatelib.UpdateChecker;
 public class MainActivity extends AppCompatActivity {
 
 
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_main);
 
-        Button btn1 = (Button) findViewById(R.id.button1);
-        Button btn2 = (Button) findViewById(R.id.button2);
+    Button btn1 = (Button) findViewById(R.id.button1);
+    Button btn2 = (Button) findViewById(R.id.button2);
 
-        btn1.setOnClickListener(new OnClickListener() {
+    btn1.setOnClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                UpdateChecker.checkForDialog(MainActivity.this);
-            }
-        });
-        btn2.setOnClickListener(new OnClickListener() {
+      @Override
+      public void onClick(View v) {
+        UpdateChecker.checkForDialog(MainActivity.this);
+      }
+    });
+    btn2.setOnClickListener(new OnClickListener() {
 
-            @Override
-            public void onClick(View v) {
-                UpdateChecker.checkForNotification(MainActivity.this);
-            }
-        });
+      @Override
+      public void onClick(View v) {
+        UpdateChecker.checkForNotification(MainActivity.this);
+      }
+    });
 
 
-        TextView textView = (TextView) findViewById(R.id.textView1);
+    TextView textView = (TextView) findViewById(R.id.textView1);
 
-        textView.setText("当前版本信息: versionName = " + AppUtils.getVersionName(this) + " versionCode = " + AppUtils.getVersionCode(this));
-    }
+    textView.setText("当前版本信息: versionName = " + AppUtils.getVersionName(this) + " versionCode = " + AppUtils.getVersionCode(this));
+  }
 
 }
