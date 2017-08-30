@@ -52,6 +52,8 @@ public class MainActivity extends AppCompatActivity {
     });
 
 
+
+
     TextView textView = (TextView) findViewById(R.id.textView1);
 
     textView.setText("当前版本信息: versionName = " + AppUtils.getVersionName(this) + " versionCode = " + AppUtils.getVersionCode(this));
