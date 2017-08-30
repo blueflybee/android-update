@@ -28,6 +28,7 @@ public class MainActivity extends AppCompatActivity {
     Button btn2 = (Button) findViewById(R.id.button2);
     Button btn3 = (Button) findViewById(R.id.button3);
 
+
     btn1.setOnClickListener(new OnClickListener() {
 
       @Override
