@@ -20,7 +20,7 @@ import org.json.JSONObject;
  * @author feicien (ithcheng@gmail.com)
  * @since 2016-07-05 19:21
  */
-class CheckUpdateTask extends AsyncTask<Void, Void, String> {
+class CheckUpdateTask extends AsyncTask<String, Void, String> {
 
   private ProgressDialog dialog;
   private Context mContext;
@@ -114,7 +114,9 @@ class CheckUpdateTask extends AsyncTask<Void, Void, String> {
   }
 
   @Override
-  protected String doInBackground(Void... args) {
-    return HttpUtils.get(url);
+  protected String doInBackground(String... args) {
+    if (args == null || args.length == 0) return HttpUtils.get(url);
+    System.out.println("args[0] = " + args[0]);
+    return args[0];
   }
 }

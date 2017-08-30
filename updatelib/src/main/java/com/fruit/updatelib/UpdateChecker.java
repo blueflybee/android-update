@@ -24,5 +24,23 @@ public class UpdateChecker {
 
   }
 
+  public static void checkForDialog(Context context, String updateJson) {
+    if (context != null) {
+      new CheckUpdateTask(context, Constants.TYPE_DIALOG, true).execute(updateJson);
+    } else {
+      Log.e(Constants.TAG, "The arg context is null");
+    }
+  }
+
+
+  public static void checkForNotification(Context context, String updateJson) {
+    if (context != null) {
+      new CheckUpdateTask(context, Constants.TYPE_NOTIFICATION, false).execute(updateJson);
+    } else {
+      Log.e(Constants.TAG, "The arg context is null");
+    }
+
+  }
+
 
 }
