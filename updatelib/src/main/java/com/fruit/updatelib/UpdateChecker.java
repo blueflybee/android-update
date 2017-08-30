@@ -42,5 +42,19 @@ public class UpdateChecker {
 
   }
 
+  /**
+   * 立即下载，并在通知栏显示下载进度
+   * @param context
+   * @param updateJson
+   */
+  public static void checkForDownloadImmediate(Context context, String updateJson) {
+    if (context != null) {
+      new CheckUpdateTask(context, Constants.TYPE_DOWNLOAD_IMMEDIATE, false).execute(updateJson);
+    } else {
+      Log.e(Constants.TAG, "The arg context is null");
+    }
+
+  }
+
 
 }

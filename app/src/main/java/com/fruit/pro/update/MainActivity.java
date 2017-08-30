@@ -26,16 +26,12 @@ public class MainActivity extends AppCompatActivity {
 
     Button btn1 = (Button) findViewById(R.id.button1);
     Button btn2 = (Button) findViewById(R.id.button2);
+    Button btn3 = (Button) findViewById(R.id.button3);
 
-    //
-
-    System.out.println("getJsonInfo() = " + getJsonInfo());
     btn1.setOnClickListener(new OnClickListener() {
 
       @Override
       public void onClick(View v) {
-
-
         UpdateChecker.checkForDialog(MainActivity.this, getJsonInfo());
       }
     });
@@ -46,6 +42,13 @@ public class MainActivity extends AppCompatActivity {
         UpdateChecker.checkForNotification(MainActivity.this, getJsonInfo());
       }
     });
+    btn3.setOnClickListener(new OnClickListener() {
+
+      @Override
+      public void onClick(View v) {
+        UpdateChecker.checkForDownloadImmediate(MainActivity.this, getJsonInfo());
+      }
+    });
 
 
     TextView textView = (TextView) findViewById(R.id.textView1);
@@ -53,7 +56,7 @@ public class MainActivity extends AppCompatActivity {
     textView.setText("当前版本信息: versionName = " + AppUtils.getVersionName(this) + " versionCode = " + AppUtils.getVersionCode(this));
   }
 
-  private String  getJsonInfo() {
+  private String getJsonInfo() {
 
     try {
       JSONObject object = new JSONObject();

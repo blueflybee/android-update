@@ -73,6 +73,8 @@ class CheckUpdateTask extends AsyncTask<String, Void, String> {
           showNotification(mContext, updateMessage, apkUrl);
         } else if (mType == Constants.TYPE_DIALOG) {
           showDialog(mContext, updateMessage, apkUrl);
+        } else if (mType == Constants.TYPE_DOWNLOAD_IMMEDIATE) {
+          download(mContext, apkUrl);
         }
       } else if (mShowProgressDialog) {
         Toast.makeText(mContext, mContext.getString(R.string.android_auto_update_toast_no_new_update), Toast.LENGTH_SHORT).show();
@@ -81,6 +83,12 @@ class CheckUpdateTask extends AsyncTask<String, Void, String> {
     } catch (JSONException e) {
       Log.e(Constants.TAG, "parse json error");
     }
+  }
+
+  private void download(Context context, String apkUrl) {
+    Intent intent = new Intent(context.getApplicationContext(), DownloadService.class);
+    intent.putExtra(Constants.APK_DOWNLOAD_URL, apkUrl);
+    context.startService(intent);
   }
 
 
