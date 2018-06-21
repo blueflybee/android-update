@@ -1,8 +1,12 @@
 package com.fruit.pro.update;
 
+import android.annotation.SuppressLint;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.provider.SyncStateContract;
 import android.support.v7.app.AppCompatActivity;
+import android.text.TextUtils;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -10,6 +14,7 @@ import android.widget.TextView;
 
 import com.fruit.updatelib.AppUtils;
 import com.fruit.updatelib.Constants;
+import com.fruit.updatelib.DownloadService;
 import com.fruit.updatelib.UpdateChecker;
 
 import org.json.JSONException;
@@ -33,21 +38,21 @@ public class MainActivity extends AppCompatActivity {
 
       @Override
       public void onClick(View v) {
-        UpdateChecker.checkForDialog(MainActivity.this, getJsonInfo());
+        UpdateChecker.checkForDialog(MainActivity.this, getJsonInfo(), mHandler);
       }
     });
     btn2.setOnClickListener(new OnClickListener() {
 
       @Override
       public void onClick(View v) {
-        UpdateChecker.checkForNotification(MainActivity.this, getJsonInfo());
+        UpdateChecker.checkForNotification(MainActivity.this, getJsonInfo(), mHandler);
       }
     });
     btn3.setOnClickListener(new OnClickListener() {
 
       @Override
       public void onClick(View v) {
-        UpdateChecker.checkForDownloadImmediate(MainActivity.this, getJsonInfo());
+        UpdateChecker.checkForDownloadImmediate(MainActivity.this, getJsonInfo(), mHandler);
       }
     });
 
@@ -72,5 +77,27 @@ public class MainActivity extends AppCompatActivity {
       return "";
     }
   }
+
+
+  @SuppressLint("HandlerLeak")
+  private Handler mHandler = new Handler() {
+    // 接收结果，刷新界面
+    public void handleMessage(Message msg) {
+      switch (msg.what) {
+        case DownloadService.MSG_DOWNLOAD_SUCCESS:
+          String filePath = (String) msg.obj;
+          if (TextUtils.isEmpty(filePath)) System.out.println("文件下载失败");
+          System.out.println("文件下载成功");
+          break;
+
+        case DownloadService.MSG_DOWNLOAD_FAILED:
+          System.out.println("文件下载失败");
+          break;
+
+        default:
+          break;
+      }
+    }
+  };
 
 }

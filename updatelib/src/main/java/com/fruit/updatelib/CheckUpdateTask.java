@@ -7,6 +7,8 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Handler;
+import android.os.Messenger;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -26,14 +28,15 @@ class CheckUpdateTask extends AsyncTask<String, Void, String> {
   private Context mContext;
   private int mType;
   private boolean mShowProgressDialog;
+  private final Handler mHandler;
   private static final String url = Constants.UPDATE_URL;
 
-  CheckUpdateTask(Context context, int type, boolean showProgressDialog) {
+  CheckUpdateTask(Context context, int type, boolean showProgressDialog, Handler handler) {
 
     this.mContext = context;
     this.mType = type;
     this.mShowProgressDialog = showProgressDialog;
-
+    mHandler = handler;
   }
 
 
@@ -88,6 +91,7 @@ class CheckUpdateTask extends AsyncTask<String, Void, String> {
   private void download(Context context, String apkUrl) {
     Intent intent = new Intent(context.getApplicationContext(), DownloadService.class);
     intent.putExtra(Constants.APK_DOWNLOAD_URL, apkUrl);
+    intent.putExtra(Constants.APK_DOWNLOAD_MESSENGER, new Messenger(mHandler));
     context.startService(intent);
   }
 
@@ -96,17 +100,18 @@ class CheckUpdateTask extends AsyncTask<String, Void, String> {
    * Show dialog
    */
   private void showDialog(Context context, String content, String apkUrl) {
-    UpdateDialog.show(context, content, apkUrl);
+    UpdateDialog.show(context, content, apkUrl, mHandler);
   }
 
   /**
    * Show Notification
    */
   private void showNotification(Context context, String content, String apkUrl) {
-    Intent myIntent = new Intent(context, DownloadService.class);
-    myIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    myIntent.putExtra(Constants.APK_DOWNLOAD_URL, apkUrl);
-    PendingIntent pendingIntent = PendingIntent.getService(context, 0, myIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+    Intent intent = new Intent(context, DownloadService.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    intent.putExtra(Constants.APK_DOWNLOAD_URL, apkUrl);
+    intent.putExtra(Constants.APK_DOWNLOAD_MESSENGER, new Messenger(mHandler));
+    PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 
     int smallIcon = context.getApplicationInfo().icon;
     Notification notify = new NotificationCompat.Builder(context)
@@ -127,4 +132,5 @@ class CheckUpdateTask extends AsyncTask<String, Void, String> {
     System.out.println("args[0] = " + args[0]);
     return args[0];
   }
+
 }
