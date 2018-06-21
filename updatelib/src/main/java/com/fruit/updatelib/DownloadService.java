@@ -80,9 +80,13 @@ public class DownloadService extends IntentService {
       long bytesum = 0;
       int byteread = 0;
       in = urlConnection.getInputStream();
-      File dir = getCacheDir();
       String apkName = urlStr.substring(urlStr.lastIndexOf("/") + 1, urlStr.length());
-      File apkFile = new File(dir, apkName);
+      File dir = new File(getCacheDir().getAbsolutePath() + "/update");
+      if (!dir.exists()) {
+        dir.mkdir();
+      }
+      File apkFile = new File(getCacheDir().getAbsolutePath() + "/update", apkName);
+      System.out.println("apkFile.getPath() = " + apkFile.getPath());
       out = new FileOutputStream(apkFile);
       byte[] buffer = new byte[BUFFER_SIZE];
 
@@ -101,13 +105,12 @@ public class DownloadService extends IntentService {
       }
       // 下载完成
 
-      System.out.println("apkFile path= " + apkFile.getPath());
-//      installAPk(apkFile);
       sendDownloadMsg(MSG_DOWNLOAD_SUCCESS, apkFile.getAbsolutePath());
 
       mNotifyManager.cancel(NOTIFICATION_ID);
 
     } catch (Exception e) {
+      e.printStackTrace();
       Log.e(TAG, "download apk file error");
       sendDownloadMsg(MSG_DOWNLOAD_FAILED, "");
       mNotifyManager.cancel(NOTIFICATION_ID);
@@ -147,23 +150,6 @@ public class DownloadService extends IntentService {
     } catch (RemoteException e) {
       e.printStackTrace();
     }
-  }
-
-
-  private void installAPk(File apkFile) {
-    //如果没有设置SDCard写权限，或者没有sdcard,apk文件保存在内存中，需要授予权限才能安装
-    try {
-      String[] command = {"chmod", "777", apkFile.toString()};
-      ProcessBuilder builder = new ProcessBuilder(command);
-      builder.start();
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-    Intent intent = new Intent(Intent.ACTION_VIEW);
-    intent.setDataAndType(Uri.fromFile(apkFile), "application/vnd.android.package-archive");
-    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-    startActivity(intent);
-
   }
 
 }

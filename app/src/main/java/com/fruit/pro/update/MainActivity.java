@@ -1,10 +1,14 @@
 package com.fruit.pro.update;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
+import android.net.Uri;
+import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.SyncStateContract;
+import android.support.v4.content.FileProvider;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.view.View;
@@ -19,6 +23,9 @@ import com.fruit.updatelib.UpdateChecker;
 
 import org.json.JSONException;
 import org.json.JSONObject;
+
+import java.io.File;
+import java.io.IOException;
 
 
 public class MainActivity extends AppCompatActivity {
@@ -57,8 +64,6 @@ public class MainActivity extends AppCompatActivity {
     });
 
 
-
-
     TextView textView = (TextView) findViewById(R.id.textView1);
 
     textView.setText("当前版本信息: versionName = " + AppUtils.getVersionName(this) + " versionCode = " + AppUtils.getVersionCode(this));
@@ -81,13 +86,10 @@ public class MainActivity extends AppCompatActivity {
 
   @SuppressLint("HandlerLeak")
   private Handler mHandler = new Handler() {
-    // 接收结果，刷新界面
     public void handleMessage(Message msg) {
       switch (msg.what) {
         case DownloadService.MSG_DOWNLOAD_SUCCESS:
-          String filePath = (String) msg.obj;
-          if (TextUtils.isEmpty(filePath)) System.out.println("文件下载失败");
-          System.out.println("文件下载成功");
+          onDownloadSuccess((String) msg.obj);
           break;
 
         case DownloadService.MSG_DOWNLOAD_FAILED:
@@ -99,5 +101,33 @@ public class MainActivity extends AppCompatActivity {
       }
     }
   };
+
+  private void onDownloadSuccess(String filePath) {
+    if (TextUtils.isEmpty(filePath)) {
+      System.out.println("文件下载失败");
+      return;
+    }
+    System.out.println("文件下载成功");
+    install(filePath);
+  }
+  /**
+   * 通过隐式意图调用系统安装程序安装APK
+   */
+  public void install(String filePath) {
+    File file = new File(filePath);
+    Intent intent = new Intent(Intent.ACTION_VIEW);
+    // 由于没有在Activity环境下启动Activity,设置下面的标签
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    if (Build.VERSION.SDK_INT >= 24) { //判读版本是否在7.0以上 //参数1 上下文, 参数2 Provider主机地址 和配置文件中保持一致 参数3 共享的文件
+      String authority = getPackageName() + ".fileprovider";
+      System.out.println("authority = " + authority);
+      Uri apkUri = FileProvider.getUriForFile(this, authority, file); //添加这一句表示对目标应用临时授权该Uri所代表的文件
+      intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+      intent.setDataAndType(apkUri, "application/vnd.android.package-archive");
+    } else {
+      intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+    }
+    startActivity(intent);
+  }
 
 }
