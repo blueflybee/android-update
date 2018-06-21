@@ -110,11 +110,36 @@ public class MainActivity extends AppCompatActivity {
     System.out.println("文件下载成功");
     install(filePath);
   }
+
+
+  private void installAPk(String filePath) {
+    //如果没有设置SDCard写权限，或者没有sdcard,apk文件保存在内存中，需要授予权限才能安装
+    File file = new File(filePath);
+    try {
+      String[] command = {"chmod", "777", file.getPath()};
+      ProcessBuilder builder = new ProcessBuilder(command);
+      builder.start();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+    Intent intent = new Intent(Intent.ACTION_VIEW);
+    intent.setDataAndType(Uri.fromFile(file), "application/vnd.android.package-archive");
+    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+    startActivity(intent);
+  }
+
   /**
    * 通过隐式意图调用系统安装程序安装APK
    */
   public void install(String filePath) {
     File file = new File(filePath);
+    try {
+      String[] command = {"chmod", "777", file.getPath()};
+      ProcessBuilder builder = new ProcessBuilder(command);
+      builder.start();
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
     Intent intent = new Intent(Intent.ACTION_VIEW);
     // 由于没有在Activity环境下启动Activity,设置下面的标签
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);

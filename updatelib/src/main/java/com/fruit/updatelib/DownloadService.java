@@ -81,11 +81,8 @@ public class DownloadService extends IntentService {
       int byteread = 0;
       in = urlConnection.getInputStream();
       String apkName = urlStr.substring(urlStr.lastIndexOf("/") + 1, urlStr.length());
-      File dir = new File(getCacheDir().getAbsolutePath() + "/update");
-      if (!dir.exists()) {
-        dir.mkdir();
-      }
-      File apkFile = new File(getCacheDir().getAbsolutePath() + "/update", apkName);
+      File dir = getCacheDir();
+      File apkFile = new File(dir, apkName);
       System.out.println("apkFile.getPath() = " + apkFile.getPath());
       out = new FileOutputStream(apkFile);
       byte[] buffer = new byte[BUFFER_SIZE];
