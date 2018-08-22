@@ -1,14 +1,17 @@
 package com.fruit.updatelib;
 
 import android.app.Notification;
+import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
+import android.os.Build;
 import android.os.Handler;
 import android.os.Messenger;
+import android.support.annotation.RequiresApi;
 import android.support.v4.app.NotificationCompat;
 import android.text.TextUtils;
 import android.util.Log;
@@ -23,6 +26,10 @@ import org.json.JSONObject;
  * @since 2016-07-05 19:21
  */
 class CheckUpdateTask extends AsyncTask<String, Void, String> {
+  private static final int NOTIFICATION_ID = 0x003;
+  private static final String CHANNEL_ID = "update_2";
+  private static final String CHANNEL_NAME = "app_update_2";
+
 
   private ProgressDialog dialog;
   private Context mContext;
@@ -112,9 +119,19 @@ class CheckUpdateTask extends AsyncTask<String, Void, String> {
     intent.putExtra(Constants.APK_DOWNLOAD_URL, apkUrl);
     intent.putExtra(Constants.APK_DOWNLOAD_MESSENGER, new Messenger(mHandler));
     PendingIntent pendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+    Notification.Builder builder;
+    if (Build.VERSION.SDK_INT >= 26) {
+      createNotificationChannel(notificationManager);
+      builder = new Notification.Builder(context, CHANNEL_ID);
+//      mBuilder.setDefaults()
+//      mBuilder.setVibrate(new long[]{0});
+    } else {
+      builder = new Notification.Builder(context);
+    }
 
     int smallIcon = context.getApplicationInfo().icon;
-    Notification notify = new NotificationCompat.Builder(context)
+    Notification notify = builder
         .setTicker(context.getString(R.string.android_auto_update_notify_ticker))
         .setContentTitle(context.getString(R.string.android_auto_update_notify_content))
         .setContentText(content)
@@ -122,10 +139,17 @@ class CheckUpdateTask extends AsyncTask<String, Void, String> {
         .setContentIntent(pendingIntent).build();
 
     notify.flags = android.app.Notification.FLAG_AUTO_CANCEL;
-    NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-    notificationManager.notify(0, notify);
+
+    notificationManager.notify(NOTIFICATION_ID, notify);
   }
 
+  @RequiresApi(api = Build.VERSION_CODES.O)
+  private void createNotificationChannel(NotificationManager notificationManager) {
+    NotificationChannel channel = new NotificationChannel(CHANNEL_ID, CHANNEL_NAME, NotificationManager.IMPORTANCE_HIGH);
+    channel.enableVibration(false);
+    channel.setVibrationPattern(new long[]{0});
+    notificationManager.createNotificationChannel(channel);
+  }
   @Override
   protected String doInBackground(String... args) {
     if (args == null || args.length == 0) return HttpUtils.get(url);
