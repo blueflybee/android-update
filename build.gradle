@@ -3,7 +3,7 @@
 buildscript {
     repositories {
         jcenter()
-        jcenter()
+        google()
         mavenCentral()
     }
     dependencies {
